@@ -41,4 +41,4 @@ jobs:
     uses: ./.github/workflows/monorepo-semver-tags.yml
     with:
       bump: ${{ needs.action.outputs.bump }}
-      filter: 's/^\.github\/workflows\/([A-Za-z0-9_-]+)\.yml$/\1/p'
+      filter: 's/^([A-Za-z0-9_-]+)\.yml$/\1/p'
