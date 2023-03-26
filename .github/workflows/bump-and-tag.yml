@@ -1,0 +1,42 @@
+name: Bump & Tag
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  tag:
+    if: |
+      github.event.pull_request.merged == true && (
+        contains(github.event.pull_request.labels.*.name, 'Bump Major & Tag') ||
+        contains(github.event.pull_request.labels.*.name, 'Bump Minor & Tag') ||
+        contains(github.event.pull_request.labels.*.name, 'Bump Patch & Tag'))
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set bump action
+        id: action
+        run: |
+          if [ "${{ contains(github.event.pull_request.labels.*.name, 'Bump Major & Tag') }}" = "true" ]
+          then
+            echo "action=major" >> $GITHUB_OUTPUT
+          elif [ "${{ contains(github.event.pull_request.labels.*.name, 'Bump Minor & Tag') }}" = "true" ]
+          then
+            echo "action=minor" >> $GITHUB_OUTPUT
+          elif [ "${{ contains(github.event.pull_request.labels.*.name, 'Bump Patch & Tag') }}" = "true" ]
+          then
+            echo "action=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Bump and tag
+        uses: ./monorepo-pr-semver-tag/action.yml
+        with:
+          bump: ${{ steps.action.outputs.action }}
+          filter: 'action.yml$'
