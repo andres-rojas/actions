@@ -5,38 +5,40 @@ on:
     types: [ closed ]
 
 jobs:
-  tag:
+  action:
+    name: Check label for action
     if: |
       github.event.pull_request.merged == true && (
         contains(github.event.pull_request.labels.*.name, 'Bump Major & Tag') ||
         contains(github.event.pull_request.labels.*.name, 'Bump Minor & Tag') ||
         contains(github.event.pull_request.labels.*.name, 'Bump Patch & Tag'))
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
 
+    outputs:
+      bump: ${{ steps.check.outputs.bump }}
+
     steps:
-      - name: Set bump action
-        id: action
+      - id: check
         run: |
           if [ "${{ contains(github.event.pull_request.labels.*.name, 'Bump Major & Tag') }}" = "true" ]
           then
-            echo "action=major" >> $GITHUB_OUTPUT
+            echo "bump=major" >> $GITHUB_OUTPUT
           elif [ "${{ contains(github.event.pull_request.labels.*.name, 'Bump Minor & Tag') }}" = "true" ]
           then
-            echo "action=minor" >> $GITHUB_OUTPUT
+            echo "bump=minor" >> $GITHUB_OUTPUT
           elif [ "${{ contains(github.event.pull_request.labels.*.name, 'Bump Patch & Tag') }}" = "true" ]
           then
-            echo "action=patch" >> $GITHUB_OUTPUT
+            echo "bump=patch" >> $GITHUB_OUTPUT
           fi
 
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+  bump-and-tag:
+    name: Bump and tag
 
-      - name: Bump and tag
-        uses: ./monorepo-pr-semver-tag
-        with:
-          bump: ${{ steps.action.outputs.action }}
-          filter: 'action.yml$'
+    needs: action
+    permissions:
+      contents: write
+
+    uses: ./.github/workflows/monorepo-semver-tags.yml
+    with:
+      bump: ${{ needs.action.outputs.bump }}
+      filter: 's/^\.github\/workflows\/([A-Za-z0-9_-]+)\.yml$/\1/p'
