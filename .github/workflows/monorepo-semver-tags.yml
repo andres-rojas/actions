@@ -1,25 +1,34 @@
-name: Monorepo Semantic Version Tags
-description: |
-  Automatically create and bump per-project semantic-versioned tags from a
-  monorepo pull request.
+name: Semantic Version Tags for Monorepos
 
-inputs:
-  bump:
-    description: Set to "major", "minor", or "patch" to bump version
-    required: true
-    default: minor
-  filter:
-    description: Only bump tags when the files changed in the PR match this filter
-    required: false
-    default: '*'
-  path:
-    description: Path (relative to root of the repo) where projects are located
-    required: false
-    default: ''
+on:
+  workflow_call:
+    inputs:
+      bump:
+        description: Bump 'major', 'minor', or 'patch' version
+        required: true
+        type: string
+      filter:
+        description: |
+          `sed` command used to filter changed files and tag based on output
+          (e.g.
+            Tag any changes made on a depth-1 subdirectory:
+              's/^([A-Za-z0-9-]+)\/.*$/\1/p'
+          )
+        required: true
+        type: string
 
-runs:
-  using: composite
-  steps:
+jobs:
+  bump-and-tag:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
     - name: Validate bump action
       id: action
       env:
@@ -30,16 +39,15 @@ runs:
           echo "Bumping ${bump} version"
           echo "action=${bump}" >> $GITHUB_OUTPUT
         fi
-      shell: bash
 
-    - name: Get changed projects
+    - name: Find changed projects
       id: changed
       if: steps.action.outputs.action != ''
       env:
         filter: ${{ inputs.filter }}
         path: ${{ inputs.path }}
       run: |
-        projects="$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep "${path}${filter}" | awk -F/ '{print $1}' | uniq)"
+        projects="$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | sed -nr "${filter}" | uniq)"
 
         echo "::group::Projects changed"
         for p in ${projects}
@@ -51,9 +59,8 @@ runs:
         echo "projects<<EOF" >> $GITHUB_OUTPUT
         echo "${projects}" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
-      shell: bash
 
-    - name: Get last tags
+    - name: Find last tags
       id: last
       if: steps.changed.outputs.projects != ''
       run: |
@@ -69,9 +76,8 @@ runs:
           echo "- ${tag}"
         done
         echo "::endgroup::"
-        
+
         echo "EOF" >> $GITHUB_OUTPUT
-      shell: bash
 
     - name: Bump version
       id: bump
@@ -99,7 +105,6 @@ runs:
         echo "tags<<EOF" >> $GITHUB_OUTPUT
         echo "${tags}" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
-      shell: bash
 
     - name: Set tags
       run: |
@@ -108,4 +113,3 @@ runs:
           git tag ${tag}
           git push origin ${tag}
         done
-      shell: bash
