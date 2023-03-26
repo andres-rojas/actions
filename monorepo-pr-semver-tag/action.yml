@@ -1,0 +1,110 @@
+name: Monorepo Semantic Version Tags
+description: |
+  Automatically create and bump tags from a PR using a semantic versioning suffix
+
+inputs:
+  bump:
+    description: Set to "major", "minor", or "patch" to bump version
+    required: true
+    default: minor
+  filter:
+    description: Only bump tags when the files changed in the PR match this filter
+    required: false
+    default: '*'
+  path:
+    description: Path (relative to root of the repo) where projects are located
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Validate bump action
+      id: action
+      env:
+        bump: ${{ inputs.bump }}
+      run: |
+        if [ "${bump}" = "major" ] || [ "${bump}" = "minor" ] || [ "${bump}" = "patch" ]
+        then
+          echo "Bumping ${bump} version"
+          echo "action=${bump}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    - name: Get changed projects
+      id: changed
+      if: steps.action.outputs.action != ''
+      env:
+        filter: ${{ inputs.filter }}
+        path: ${{ inputs.path }}
+      run: |
+        projects="$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep "${path}${filter}" | awk -F/ '{print $1}' | uniq)"
+
+        echo "::group::Projects changed"
+        for p in ${projects}
+        do
+          echo "- ${p}"
+        done
+        echo "::endgroup::"
+
+        echo "projects<<EOF" >> $GITHUB_OUTPUT
+        echo "${projects}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Get last tags
+      id: last
+      if: steps.changed.outputs.projects != ''
+      run: |
+        echo "tags<<EOF" >> $GITHUB_OUTPUT
+
+        echo "::group::Last known tags"
+        echo "${{ steps.changed.outputs.projects }}" | while IFS= read -r project
+        do
+          tag="$(git tag --sort=-version:refname -l "${project}-*" | head -1)"
+          [ "${tag}" = "" ] && tag="${project}-v0.0.0"
+          echo "${tag}" >> $GITHUB_OUTPUT
+
+          echo "- ${tag}"
+        done
+        echo "::endgroup::"
+        
+        echo "EOF" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Bump version
+      id: bump
+      if: steps.changed.outputs.projects != ''
+      run: |
+        if [ "${{ steps.action.outputs.action }}" = "major" ]
+        then
+          sed_string='s/(^.+)-v?([0-9]+)(.*)$/echo \1-v$((\2+1))/ge'
+        elif [ "${{ steps.action.outputs.action }}" = "minor" ]
+        then
+          sed_string='s/(^.+)-v?([0-9]+)\.?([0-9]*)(.*)$/echo \1-v\2.$((\3+1))/ge'
+        elif [ "${{ steps.action.outputs.action }}" = "patch" ]
+        then
+          sed_string='s/(^.+)-v?([0-9]+)\.?([0-9]*)\.?([0-9]*)(.*)$/echo \1-v\2.$((\3+0)).$((\4+1))/ge'
+        fi
+
+        tags="$(echo "${{ steps.last.outputs.tags }}" | sed -r "${sed_string}")"
+
+        echo "::group::Setting new tags"
+        for t in ${tags}
+        do
+          echo "- ${t}"
+        done
+
+        echo "tags<<EOF" >> $GITHUB_OUTPUT
+        echo "${tags}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Set tags
+      run: |
+        echo "${{ steps.bump.outputs.tags }}" | while IFS= read -r tag
+        do
+          git tag ${tag}
+          git push origin ${tag}
+        done
+      shell: bash
