@@ -1,6 +1,7 @@
 name: Monorepo Semantic Version Tags
 description: |
-  Automatically create and bump tags from a PR using a semantic versioning suffix
+  Automatically create and bump per-project semantic-versioned tags from a
+  monorepo pull request.
 
 inputs:
   bump:
