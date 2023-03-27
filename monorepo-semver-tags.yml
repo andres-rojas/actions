@@ -1,6 +1,6 @@
+---
 name: Semantic Version Tags for Monorepos
-
-on:
+on:   # yamllint disable-line rule:truthy
   workflow_call:
     inputs:
       bump:
@@ -24,92 +24,92 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Validate bump action
-      id: action
-      env:
-        bump: ${{ inputs.bump }}
-      run: |
-        if [ "${bump}" = "major" ] || [ "${bump}" = "minor" ] || [ "${bump}" = "patch" ]
-        then
-          echo "Bumping ${bump} version"
-          echo "action=${bump}" >> $GITHUB_OUTPUT
-        fi
+      - name: Validate bump action
+        id: action
+        env:
+          bump: ${{ inputs.bump }}
+        run: |
+          if [ "${bump}" = "major" ] || [ "${bump}" = "minor" ] || [ "${bump}" = "patch" ]
+          then
+            echo "Bumping ${bump} version"
+            echo "action=${bump}" >> $GITHUB_OUTPUT
+          fi
 
-    - name: Find changed projects
-      id: changed
-      if: steps.action.outputs.action != ''
-      env:
-        filter: ${{ inputs.filter }}
-        path: ${{ inputs.path }}
-      run: |
-        projects="$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | sed -nr "${filter}" | uniq)"
+      - name: Find changed projects
+        id: changed
+        if: steps.action.outputs.action != ''
+        env:
+          filter: ${{ inputs.filter }}
+          path: ${{ inputs.path }}
+        run: |
+          projects="$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | sed -nr "${filter}" | uniq)"
 
-        echo "::group::Projects changed"
-        for p in ${projects}
-        do
-          echo "- ${p}"
-        done
-        echo "::endgroup::"
+          echo "::group::Projects changed"
+          for p in ${projects}
+          do
+            echo "- ${p}"
+          done
+          echo "::endgroup::"
 
-        echo "projects<<EOF" >> $GITHUB_OUTPUT
-        echo "${projects}" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+          echo "projects<<EOF" >> $GITHUB_OUTPUT
+          echo "${projects}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-    - name: Find last tags
-      id: last
-      if: steps.changed.outputs.projects != ''
-      run: |
-        echo "tags<<EOF" >> $GITHUB_OUTPUT
+      - name: Find last tags
+        id: last
+        if: steps.changed.outputs.projects != ''
+        run: |
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
 
-        echo "::group::Last known tags"
-        echo "${{ steps.changed.outputs.projects }}" | while IFS= read -r project
-        do
-          tag="$(git tag --sort=-version:refname -l "${project}-*" | head -1)"
-          [ "${tag}" = "" ] && tag="${project}-v0.0.0"
-          echo "${tag}" >> $GITHUB_OUTPUT
+          echo "::group::Last known tags"
+          echo "${{ steps.changed.outputs.projects }}" | while IFS= read -r project
+          do
+            tag="$(git tag --sort=-version:refname -l "${project}-*" | head -1)"
+            [ "${tag}" = "" ] && tag="${project}-v0.0.0"
+            echo "${tag}" >> $GITHUB_OUTPUT
 
-          echo "- ${tag}"
-        done
-        echo "::endgroup::"
+            echo "- ${tag}"
+          done
+          echo "::endgroup::"
 
-        echo "EOF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-    - name: Bump version
-      id: bump
-      if: steps.changed.outputs.projects != ''
-      run: |
-        if [ "${{ steps.action.outputs.action }}" = "major" ]
-        then
-          sed_string='s/(^.+)-v?([0-9]+)(.*)$/echo \1-v$((\2+1))/ge'
-        elif [ "${{ steps.action.outputs.action }}" = "minor" ]
-        then
-          sed_string='s/(^.+)-v?([0-9]+)\.?([0-9]*)(.*)$/echo \1-v\2.$((\3+1))/ge'
-        elif [ "${{ steps.action.outputs.action }}" = "patch" ]
-        then
-          sed_string='s/(^.+)-v?([0-9]+)\.?([0-9]*)\.?([0-9]*)(.*)$/echo \1-v\2.$((\3+0)).$((\4+1))/ge'
-        fi
+      - name: Bump version
+        id: bump
+        if: steps.changed.outputs.projects != ''
+        run: |
+          if [ "${{ steps.action.outputs.action }}" = "major" ]
+          then
+            sed_string='s/(^.+)-v?([0-9]+)(.*)$/echo \1-v$((\2+1))/ge'
+          elif [ "${{ steps.action.outputs.action }}" = "minor" ]
+          then
+            sed_string='s/(^.+)-v?([0-9]+)\.?([0-9]*)(.*)$/echo \1-v\2.$((\3+1))/ge'
+          elif [ "${{ steps.action.outputs.action }}" = "patch" ]
+          then
+            sed_string='s/(^.+)-v?([0-9]+)\.?([0-9]*)\.?([0-9]*)(.*)$/echo \1-v\2.$((\3+0)).$((\4+1))/ge'
+          fi
 
-        tags="$(echo "${{ steps.last.outputs.tags }}" | sed -r "${sed_string}")"
+          tags="$(echo "${{ steps.last.outputs.tags }}" | sed -r "${sed_string}")"
 
-        echo "::group::Setting new tags"
-        for t in ${tags}
-        do
-          echo "- ${t}"
-        done
+          echo "::group::Setting new tags"
+          for t in ${tags}
+          do
+            echo "- ${t}"
+          done
 
-        echo "tags<<EOF" >> $GITHUB_OUTPUT
-        echo "${tags}" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          echo "${tags}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-    - name: Set tags
-      run: |
-        echo "${{ steps.bump.outputs.tags }}" | while IFS= read -r tag
-        do
-          git tag ${tag}
-          git push origin ${tag}
-        done
+      - name: Set tags
+        run: |
+          echo "${{ steps.bump.outputs.tags }}" | while IFS= read -r tag
+          do
+            git tag ${tag}
+            git push origin ${tag}
+          done

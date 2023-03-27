@@ -1,5 +1,6 @@
+---
 name: Lint
-on: [push, workflow_dispatch]
+on: [push, workflow_dispatch]   # yamllint disable-line rule:truthy
 
 jobs:
   lint:
@@ -8,3 +9,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: yaml-lint
         uses: ibiqlik/action-yamllint@v3
+        with:
+          config_data: |
+            extends: default
+            rules:
+              max: 120
+              level: warning
