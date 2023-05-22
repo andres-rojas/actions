@@ -13,7 +13,6 @@ jobs:
         contains(github.event.pull_request.labels.*.name, 'Bump Minor & Tag') ||
         contains(github.event.pull_request.labels.*.name, 'Bump Patch & Tag'))
     runs-on: ubuntu-latest
-
     outputs:
       bump: ${{ steps.check.outputs.bump }}
 
