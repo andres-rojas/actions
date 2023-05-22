@@ -1,5 +1,7 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "containerEnv": {
+    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -19,8 +21,6 @@
     },
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {}
   },
-  "postCreateCommand": "ls >/dev/null && /usr/local/py-utils/bin/pre-commit install",
-  "containerEnv": {
-    "GH_TOKEN": "${localEnv:GH_TOKEN}"
-  }
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "postCreateCommand": "ls >/dev/null && /usr/local/py-utils/bin/pre-commit install"
 }
