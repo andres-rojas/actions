@@ -1,3 +1,5 @@
+[![Local dev in VS Code](https://img.shields.io/badge/Dev%20locally-in%20VS%20Code-%235BA7EC)](https://devpod.sh/open#https%3A%2F%2Fgithub.com%2Fandres-rojas%2Freusable-workflows&workspace=reusable-workflows&provider=docker&ide=vscode)
+
 # Available workflows
 
 - [`monorepo-semver-tags.yml`](.github/workflows/monorepo-semver-tags.yml)
