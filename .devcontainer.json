@@ -3,6 +3,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "arahata.linter-actionlint",
         "github.vscode-github-actions"
       ]
     }
