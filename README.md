@@ -1,5 +1,3 @@
-[![Local dev in VS Code](https://img.shields.io/badge/Dev%20locally-in%20VS%20Code-%235BA7EC)](https://devpod.sh/open#https%3A%2F%2Fgithub.com%2Fandres-rojas%2Freusable-workflows&workspace=reusable-workflows&provider=docker&ide=vscode)
-
 # Available workflows
 
 - [`monorepo-semver-tags.yml`](.github/workflows/monorepo-semver-tags.yml)
@@ -21,6 +19,9 @@ bump-and-tag:
 To trigger on pull request labels, see [this repo's implementation](./.github/workflows/bump-and-tag.yml).
 
 # Development
+
+[![VS Code (local)](https://img.shields.io/badge/local-VS%20Code-%235BA7EC)](https://devpod.sh/open#https%3A%2F%2Fgithub.com%2Fandres-rojas%2Freusable-workflows&workspace=reusable-workflows&provider=docker&ide=vscode)
+[![GitHub Codespaces (remote)](https://img.shields.io/badge/remote-GitHub%20Codespaces-%232F353B)](https://codespaces.new/github/docs)
 
 ## Dev Container
 
