@@ -13,6 +13,10 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers-contrib/features/act:1": {},
     "ghcr.io/devcontainers-contrib/features/actionlint:1": {},
+    "ghcr.io/devcontainers-contrib/features/npm-package:1": {
+      "package": "prettier",
+      "version": "2.8.8"
+    },
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {}
   },
   "postCreateCommand": "ls >/dev/null && /usr/local/py-utils/bin/pre-commit install"
