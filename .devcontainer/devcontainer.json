@@ -35,5 +35,5 @@
       "type": "bind"
     }
   ],
-  "postCreateCommand": ".devcontainer/bootstrap.sh"
+  "postCreateCommand": ".devcontainer/postCreate.sh"
 }
