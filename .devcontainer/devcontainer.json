@@ -23,5 +23,12 @@
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {}
   },
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "postCreateCommand": "ls >/dev/null && /usr/local/py-utils/bin/pre-commit install"
+  "mounts": [
+    {
+      "source": "${localEnv:HOME}/.config/gh",
+      "target": "/.config/gh",
+      "type": "bind"
+    }
+  ],
+  "postCreateCommand": ".devcontainer/bootstrap.sh"
 }
