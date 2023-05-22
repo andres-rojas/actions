@@ -1,5 +1,3 @@
-A collection of reusable workflows for Github Actions.
-
 # Available workflows
 
 - [`monorepo-semver-tags.yml`](.github/workflows/monorepo-semver-tags.yml)
@@ -45,13 +43,12 @@ When used via [Visual Studio Code](https://code.visualstudio.com/docs/devcontain
 
 The following linters are expected to be used and will be enforced via CI automation:
 
-- [actionlint](https://marketplace.visualstudio.com/items?itemName=arahata.linter-actionlint)
+- [actionlint](https://github.com/rhysd/actionlint)
 
 ## Formatting
 
 The following formatters are expected to be used and will be enforced via CI automation:
 
-- [actionlint](https://github.com/rhysd/actionlint)
 - [prettier](https://prettier.io/)
 
 ## Pre-Commit Hooks
