@@ -28,6 +28,7 @@
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {}
   },
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "initializeCommand": ".devcontainer/initialize.sh",
   "mounts": [
     {
       "source": "${localEnv:HOME}/.config/gh",
