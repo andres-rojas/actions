@@ -6,6 +6,7 @@
     "vscode": {
       "extensions": [
         "arahata.linter-actionlint",
+        "esbenp.prettier-vscode",
         "github.vscode-github-actions"
       ]
     }
