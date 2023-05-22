@@ -19,5 +19,8 @@
     },
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {}
   },
-  "postCreateCommand": "ls >/dev/null && /usr/local/py-utils/bin/pre-commit install"
+  "postCreateCommand": "ls >/dev/null && /usr/local/py-utils/bin/pre-commit install",
+  "containerEnv": {
+    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+  }
 }
