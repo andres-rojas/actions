@@ -1,6 +1,6 @@
 ---
 name: Semantic Version Tags for Monorepos
-on:   # yamllint disable-line rule:truthy
+on:
   workflow_call:
     inputs:
       bump:
@@ -45,7 +45,6 @@ jobs:
         if: steps.action.outputs.action != ''
         env:
           filter: ${{ inputs.filter }}
-          path: ${{ inputs.path }}
         run: |
           projects="$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | sed -nr "${filter}" | uniq)"
 

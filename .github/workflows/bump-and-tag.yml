@@ -1,6 +1,6 @@
 ---
 name: Bump & Tag
-on:   # yamllint disable-line rule:truthy
+on:
   pull_request:
     types: [closed]
 
