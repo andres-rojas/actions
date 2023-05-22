@@ -28,12 +28,12 @@ To trigger on pull request labels, see [this repo's implementation](./.github/wo
 
 A pre-packaged development environment is provided as a [Development Container](https://containers.dev/).
 
-The [.devcontainer.json](.devcontainer.json) file deploys an Ubuntu environment with the following tools:
+The [.devcontainer.json](.devcontainer/devcontainer.json) file deploys an Ubuntu environment with:
 
-- [act](https://github.com/nektos/act)
 - [GitHub CLI](https://cli.github.com/)
-
-All [pre-commit hooks](#pre-commit-hooks) are also installed.
+- all required [linters](#linting)
+- all required [formatters](#formatting)
+- all [pre-commit hooks](#pre-commit-hooks)
 
 #### VS Code
 
@@ -41,12 +41,28 @@ When used via [Visual Studio Code](https://code.visualstudio.com/docs/devcontain
 
 - [actionlint](https://marketplace.visualstudio.com/items?itemName=arahata.linter-actionlint)
 - [GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions)
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-### Pre-Commit Hooks
+### Linting
 
-Pre-commit git hooks are set up and managed via [pre-commit](https://pre-commit.com/).
+The following linters are expected to be used and will be enforced via CI automation:
 
-The [.pre-commit-config.yaml](.pre-commit-config.yaml) file uses the following linters:
+- [actionlint](https://marketplace.visualstudio.com/items?itemName=arahata.linter-actionlint)
+
+### Formatting
+
+The following formatters are expected to be used and will be enforced via CI automation:
 
 - [actionlint](https://github.com/rhysd/actionlint)
 - [prettier](https://prettier.io/)
+
+### Pre-Commit Hooks
+
+Pre-commit git hooks are available via [pre-commit](https://pre-commit.com/).
+
+To get set up, [install pre-commit](https://pre-commit.com/#install) and the hooks into a local copy of this repository:
+
+```shell
+brew install pre-commit
+pre-commit install
+```
