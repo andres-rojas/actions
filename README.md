@@ -1,14 +1,12 @@
-# Reusable Workflows
-
 A collection of reusable workflows for Github Actions.
 
-## Available workflows
+# Available workflows
 
 - [`monorepo-semver-tags.yml`](.github/workflows/monorepo-semver-tags.yml)
 
 This workflow creates and bumps semantic version tags on a per-project basis in a monorepo.
 
-### Usage
+## Usage
 
 ```yaml
 bump-and-tag:
@@ -22,9 +20,9 @@ bump-and-tag:
 
 To trigger on pull request labels, see [this repo's implementation](./.github/workflows/bump-and-tag.yml).
 
-## Development
+# Development
 
-### Dev Container
+## Dev Container
 
 A pre-packaged development environment is provided as a [Development Container](https://containers.dev/).
 
@@ -35,7 +33,7 @@ The [.devcontainer.json](.devcontainer/devcontainer.json) file deploys an Ubuntu
 - all required [formatters](#formatting)
 - all [pre-commit hooks](#pre-commit-hooks)
 
-#### VS Code
+### VS Code
 
 When used via [Visual Studio Code](https://code.visualstudio.com/docs/devcontainers/containers), the following extensions are included:
 
@@ -43,20 +41,20 @@ When used via [Visual Studio Code](https://code.visualstudio.com/docs/devcontain
 - [GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-### Linting
+## Linting
 
 The following linters are expected to be used and will be enforced via CI automation:
 
 - [actionlint](https://marketplace.visualstudio.com/items?itemName=arahata.linter-actionlint)
 
-### Formatting
+## Formatting
 
 The following formatters are expected to be used and will be enforced via CI automation:
 
 - [actionlint](https://github.com/rhysd/actionlint)
 - [prettier](https://prettier.io/)
 
-### Pre-Commit Hooks
+## Pre-Commit Hooks
 
 Pre-commit git hooks are available via [pre-commit](https://pre-commit.com/).
 
